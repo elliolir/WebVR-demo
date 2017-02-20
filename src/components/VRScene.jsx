@@ -1,7 +1,7 @@
 import 'aframe';
 import 'aframe-animation-component';
-import 'aframe-text-component';
-import 'aframe-bmfont-text-component';
+// import 'aframe-text-component';
+// import 'aframe-bmfont-text-component';
 import {Entity, Scene} from 'aframe-react';
 import Text from "./Text.jsx";
 import Camera from "./Camera.jsx";
@@ -120,6 +120,7 @@ export class VRScene extends React.Component {
                         material={material}
                         position={[columnIndex, ROWS - rowIndex,  0]}
                     />)
+                // return null;
             }));
         });
 
