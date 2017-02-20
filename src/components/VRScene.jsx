@@ -40,16 +40,23 @@ export class VRScene extends React.Component {
         ];
     }
     startGame(){
-        setInterval(()=>{
+      if (!this.state.isStarted) {
+        var id = setInterval(()=>{
             var player = DeepCopy(this.state.player);
             player.pos.y++;
             this.setState({player: player});
         }, 1000);
-        this.setState({ isStarted: true});
+        this.setState({ isStarted: true, id: id});
+      }
+      else {
+        clearInterval(this.state.id);
+        this.setState({ isStarted: false});
+      }
+
     }
     initField(){
         const ROWS = 20;
-        const COLUMNS = 10;
+        const COLUMNS = 12;
         var clearField = [];
 
         for (var i = 0; i < ROWS; i++) {
@@ -62,9 +69,6 @@ export class VRScene extends React.Component {
     rotate(){
         var playerMatrix = DeepCopy(this.state.player.matrix);
         var rotatedMatrix = ArrayHelper.rotateClockwise(playerMatrix);
-
-        console.log("click");
-
         var updatedPlayer = DeepCopy(this.state.player);
         updatedPlayer.matrix = rotatedMatrix;
         this.setState({player: updatedPlayer});
@@ -102,7 +106,7 @@ export class VRScene extends React.Component {
         var field = this.state.field;
         var player = this.state.player;
         const ROWS = 20;
-        const COLUMNS = 10;
+        const COLUMNS = 12;
         var entityList = [];
         var material;
 
@@ -119,7 +123,7 @@ export class VRScene extends React.Component {
                     <BasicSquare
                         material={material}
                         position={[columnIndex, ROWS - rowIndex,  0]}
-                    />)
+                    />);
                 // return null;
             }));
         });

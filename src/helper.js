@@ -24,9 +24,16 @@ export default class Helper {
         }
     }
     static _revertRows(array) {
-        array.reverse();
+        array.forEach(row => {row.reverse()});
     }
     static _revertColumns(array) {
-        array.forEach(row => {row.reverse()});
+        var temp;
+        for (var j = 0; j< array.length;j++){
+            for (var  i = 0; i<array.length/2; i++){
+                temp = array[i][j];
+                array[i][j] = array[array.length - i][j];
+                array[array.length - i][j] = temp;
+            }
+        }
     }
 }
