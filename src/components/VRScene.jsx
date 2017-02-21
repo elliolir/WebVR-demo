@@ -44,7 +44,16 @@ export class VRScene extends React.Component {
         var id = setInterval(()=>{
             var player = DeepCopy(this.state.player);
             player.pos.y++;
-            this.setState({player: player});
+            if (this.isCollide(player)) {
+                // console.log("dead");
+                player.pos.y--;
+                this.merge();
+                player.pos.y = 0;
+                this.setState({player: player});
+            }
+            else {
+                this.setState({player: player});
+            }
         }, 1000);
         this.setState({ isStarted: true, id: id});
       }
@@ -76,30 +85,59 @@ export class VRScene extends React.Component {
 
     merge() {
         //merge player figure and game field
-        this.state.player.matrix.forEach((row, y) => {
+        this.state.player.matrix.forEach((row, rowIndex) => {
             row.forEach((value, x) => {
                 if (value !== 0) {
                     this.setState(prevState =>{
-                        prevState.field[y + prevState.player.pos.y][x + prevState.player.pos.x] = value;
+                        prevState.field[rowIndex + prevState.player.pos.y][x + prevState.player.pos.x] = value;
                     });
                 }
             });
         });
     }
-    isCollide(){
-        var matrix = this.state.player.matrix;
-        var position = this.state.player.pos;
+    isCollide(player){
+        var matrix = player.matrix;
+        var position = player.pos;
         var field = this.state.field;
 
-        for (let i = 0; i < matrix.length; i++) {
-            for (let j = 0; j < matrix[i].length; j++) {
-                if (matrix[i][j] !== 0 &&
-                    (field[i + position.i] &&
-                    field[i + position.i][j + position.j]) !== 0) {
-                    return true;
+        for (var i = 0; i < matrix.length; i++) {
+            for (var j = 0; j < matrix[i].length; j++) {
+              if (matrix[i][j]) {
+                if (!(typeof field[i + position.y] != "undefined"
+                    && typeof field[i + position.y][j + position.x] != "undefined"
+                    && !field[i + position.y][j + position.x])){
+                      return true;
                 }
+              }
+
+
+                // if (matrix[i][j]
+                //     && !field[i + position.y]
+                //     && !field[i + position.y][j + position.x]) {
+                //     return true;
+                // }
             }
         }
+
+        // for (var i in matrix) {
+        //     for (var j in matrix[i]) {
+        //         if (matrix[i][j]
+        //         && field[i + position.y] !== 0
+        //         && field[i + position.y][j + position.x]) {
+        //           return true;
+        //         }
+        //     }
+        // }
+
+        // matrix.forEach((row, i)=> {
+        //     row.forEach((elem, j) => {
+        //         if (elem && field[i + position.y]
+        //             && field[i + position.y][j + position.x]) {
+        //             return true;
+        //         }
+        //     })
+        // })
+
         return false;
     }
     drawField(){
@@ -113,7 +151,7 @@ export class VRScene extends React.Component {
         field.forEach((row, rowIndex) => {
             entityList.push(row.map((elem, columnIndex) => {
                 if (elem == 0) {
-                    material = "color: #22b999"
+                    return null;
                 }
                 else {
                     material = "color: #6173F4"
