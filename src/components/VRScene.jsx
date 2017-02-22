@@ -102,41 +102,11 @@ export class VRScene extends React.Component {
 
         for (var i = 0; i < matrix.length; i++) {
             for (var j = 0; j < matrix[i].length; j++) {
-              if (matrix[i][j]) {
-                if (!(typeof field[i + position.y] != "undefined"
-                    && typeof field[i + position.y][j + position.x] != "undefined"
-                    && !field[i + position.y][j + position.x])){
-                      return true;
+                if (matrix[i][j] && (!field[i + position.y] || field[i + position.y][j + position.x] != 0)) {
+                    return true;
                 }
-              }
-
-
-                // if (matrix[i][j]
-                //     && !field[i + position.y]
-                //     && !field[i + position.y][j + position.x]) {
-                //     return true;
-                // }
             }
         }
-
-        // for (var i in matrix) {
-        //     for (var j in matrix[i]) {
-        //         if (matrix[i][j]
-        //         && field[i + position.y] !== 0
-        //         && field[i + position.y][j + position.x]) {
-        //           return true;
-        //         }
-        //     }
-        // }
-
-        // matrix.forEach((row, i)=> {
-        //     row.forEach((elem, j) => {
-        //         if (elem && field[i + position.y]
-        //             && field[i + position.y][j + position.x]) {
-        //             return true;
-        //         }
-        //     })
-        // })
 
         return false;
     }
