@@ -140,6 +140,17 @@ export class VRScene extends React.Component {
 
         return false;
     }
+    drawBackground(){
+        const ROWS = 20;
+        const COLUMNS = 12;
+
+        var geometry = {primitive: "plane", height: ROWS, width: COLUMNS};
+
+        return (<Entity geometry={geometry}
+                        position="0 1 -11"
+                        material={"color:white"}
+                        />);
+    }
     drawField(){
         var field = this.state.field;
         var player = this.state.player;
@@ -201,7 +212,7 @@ export class VRScene extends React.Component {
                 material="color:#FFF"
                 onClick={this.startGame.bind(this)}/>
 
-
+                {/*{this.drawBackground()}*/}
                 <Entity position="-5 -10 -10">{this.drawField()}</Entity>
 
                 {/*<Z position={[-10, 0, -5]}/>*/}
