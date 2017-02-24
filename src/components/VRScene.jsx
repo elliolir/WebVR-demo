@@ -1,5 +1,6 @@
 import 'aframe';
 import 'aframe-animation-component';
+import 'aframe-html-shader';
 // import 'aframe-text-component';
 // import 'aframe-bmfont-text-component';
 import {Entity, Scene} from 'aframe-react';
@@ -7,17 +8,12 @@ import Text from "./Text.jsx";
 import Camera from "./Camera.jsx";
 import ArrayHelper from "../helper";
 import BasicSquare from "./figures/basicSquare.jsx";
-import {L} from "./figures/L.jsx";
-import {J} from "./figures/J.jsx";
-import {I} from "./figures/I.jsx";
-import {O} from "./figures/O.jsx";
-import {T} from "./figures/T.jsx";
-import {S} from "./figures/S.jsx";
-import {Z} from "./figures/Z.jsx";
-import Background from "./Background.jsx";
+
 import Cursor from "./Cursor.jsx";
 import React from 'react';
+import {HtmlContainer} from "./HtmlContainer.jsx";
 import DeepCopy from '../DeepCopy';
+import "../styles.less";
 
 export class VRScene extends React.Component {
     constructor(props) {
@@ -164,50 +160,55 @@ export class VRScene extends React.Component {
     }
     render () {
         return (
-            <Scene antialias="true"
-                   fog="type: linear; color: #e2e2e2; far: 30; near: 0"
-                   inspector="url: https://aframe.io/aframe-inspector/dist/aframe-inspector.js">
-                <Camera>
-                    {/*<Text*/}
+            <div>
+                <Scene antialias="true"
+                       fog="type: linear; color: #e2e2e2; far: 30; near: 0"
+                       inspector="url: https://aframe.io/aframe-inspector/dist/aframe-inspector.js">
+                    <Camera>
+                        {/*<Text*/}
                         {/*text='Hello World1!'*/}
                         {/*color='#521616'*/}
                         {/*position='-1.75 1 -3'/>*/}
-                    <Cursor/>
-                </Camera>
-                <Entity primitive={"a-sound"} sound="src: ./theme.mp3; autoplay: true; loop: true" />
-                <Entity primitive={"a-sky"} color="#AAB" />
+                        <Cursor/>
+                    </Camera>
+                    <Entity primitive={"a-sound"} sound="src: ./theme.mp3; autoplay: true; loop: true" />
+                    <Entity primitive={"a-sky"} color="#AAB" />
 
-                <BasicSquare
-                position='-1.75 7 -3'
-                material="color:#FFF"
-                onClick={this.startGame.bind(this)}/>
+                    <BasicSquare
+                        position='-1.75 7 -3'
+                        material="shader:html;target:#html-source"
 
-                {/*{this.drawBackground()}*/}
-                <Entity position="-5 -10 -10">{this.drawField()}</Entity>
+                        onClick={this.startGame.bind(this)}/>
 
-                {/*<Z position={[-10, 0, -5]}/>*/}
+                    {/*{this.drawBackground()}*/}
+                    <Entity position="-5 -10 -10">{this.drawField()}</Entity>
 
-                {/*<S position={[-7, 0, -5]}/>*/}
+                    {/*<Z position={[-10, 0, -5]}/>*/}
 
-                {/*<T position={[-4, 0, -5]}/>*/}
+                    {/*<S position={[-7, 0, -5]}/>*/}
 
-                {/*<L position={[0, 0, -5]}/>*/}
+                    {/*<T position={[-4, 0, -5]}/>*/}
 
-                {/*<J position={[4, 0, -5]}/>*/}
+                    {/*<L position={[0, 0, -5]}/>*/}
 
-                {/*<I position={[6, 0, -5]}/>*/}
+                    {/*<J position={[4, 0, -5]}/>*/}
 
-                {/*<O position={[8, 0, -5]}/>*/}
+                    {/*<I position={[6, 0, -5]}/>*/}
+
+                    {/*<O position={[8, 0, -5]}/>*/}
 
 
-                {/*<Entity geometry={{primitive: 'box'}}*/}
-                        {/*material="color: red"*/}
-                        {/*position={[0, 2, -5]}*/}
-                        {/*scale="2 2 2"*/}
-                        {/*rotation="0 45 45"*/}
-                        {/*animation="property: scale; dir: alternate; dur: 200;*/}
-                           {/*easing: easeInSine; loop: true; to: 1.2 1 1.2"/>*/}
-            </Scene>
+                    {/*<Entity geometry={{primitive: 'box'}}*/}
+                    {/*material="color: red"*/}
+                    {/*position={[0, 2, -5]}*/}
+                    {/*scale="2 2 2"*/}
+                    {/*rotation="0 45 45"*/}
+                    {/*animation="property: scale; dir: alternate; dur: 200;*/}
+                    {/*easing: easeInSine; loop: true; to: 1.2 1 1.2"/>*/}
+                </Scene>
+
+                <HtmlContainer/>
+            </div>
         );
     }
 }
