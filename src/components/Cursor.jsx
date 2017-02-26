@@ -13,6 +13,15 @@ export default props => {
     //     width="0.01"
     //     {...extraProps}/>
 
-    return <a-cursor
-        material="color: #2c2690; shader: flat"/>
+    return (<a-cursor
+              material="color: #2c2690; shader: flat">
+                <a-animation
+                  begin="click"
+                  easing="ease-in"
+                  attribute="scale"
+                  fill="backwards"
+                  from="0.1 0.1 0.1"
+                  to="1 1 1"
+                  dur="150"/>
+            </a-cursor>)
 };
