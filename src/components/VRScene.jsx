@@ -1,13 +1,14 @@
 import 'aframe';
 import 'aframe-animation-component';
 import 'aframe-html-shader';
-// import 'aframe-text-component';
+//import 'aframe-text-component';
 // import 'aframe-bmfont-text-component';
 import {Entity, Scene} from 'aframe-react';
-import Text from "./Text.jsx";
+//import Text from "./Text.jsx";
 import Camera from "./Camera.jsx";
 import ArrayHelper from "../helper";
 import BasicSquare from "./figures/basicSquare.jsx";
+import Hint from "./Hint.jsx";
 
 import Cursor from "./Cursor.jsx";
 import React from 'react';
@@ -28,6 +29,7 @@ export class VRScene extends React.Component {
             isStarted: false
         };
         this.initField();
+        this.initKeyboardControlls();
 
         this.state.player.matrix = [
             [0,1,0],
@@ -45,11 +47,9 @@ export class VRScene extends React.Component {
                 player.pos.y--;
                 this.merge();
                 player.pos.y = 0;
-                this.setState({player: player});
+                //clearInterval(this.state.id);
             }
-            else {
-                this.setState({player: player});
-            }
+            this.setState({player: player});
         }, 1000);
         this.setState({ isStarted: true, id: id});
       }
@@ -60,8 +60,7 @@ export class VRScene extends React.Component {
 
     }
     initField(){
-        const ROWS = 20;
-        const COLUMNS = 12;
+        const [ROWS, COLUMNS] = [this.props.size.i, this.props.size.j];
         var clearField = [];
 
         for (var i = 0; i < ROWS; i++) {
@@ -81,15 +80,17 @@ export class VRScene extends React.Component {
 
     merge() {
         //merge player figure and game field
-        this.state.player.matrix.forEach((row, rowIndex) => {
+        var field = DeepCopy(this.state.field);
+        var player = this.state.player;
+        player.matrix.forEach((row, rowIndex) => {
             row.forEach((value, x) => {
                 if (value !== 0) {
-                    this.setState(prevState =>{
-                        prevState.field[rowIndex + prevState.player.pos.y][x + prevState.player.pos.x] = value;
-                    });
+                    field[rowIndex + player.pos.y][x + player.pos.x] = value;
                 }
             });
         });
+
+        this.setState({field: field});
     }
     isCollide(player){
         var matrix = player.matrix;
@@ -106,9 +107,17 @@ export class VRScene extends React.Component {
 
         return false;
     }
+    drawMenu(){
+      if (!this.state.isStarted) {
+        return (
+          <BasicSquare
+            position='-1.75 7 -3'
+            material="shader:html;target:#html-source"
+            onClick={this.startGame.bind(this)}/>)
+      }
+    }
     drawBackground(){
-        const ROWS = 20;
-        const COLUMNS = 12;
+        const [ROWS, COLUMNS] = [this.props.size.i, this.props.size.j];
 
         var geometry = {primitive: "plane", height: ROWS, width: COLUMNS};
 
@@ -118,10 +127,10 @@ export class VRScene extends React.Component {
                         />);
     }
     drawField(){
+        const ROWS = this.props.size.i;
+
         var field = this.state.field;
         var player = this.state.player;
-        const ROWS = 20;
-        const COLUMNS = 12;
         var entityList = [];
         var material;
 
@@ -158,31 +167,66 @@ export class VRScene extends React.Component {
 
         return entityList;
     }
+    initKeyboardControlls(){
+        window.addEventListener('keydown', this.moveHandler.bind(this), false);
+    }
+    moveHandler(event){
+        const {code} = event;
+        var moveTo;
+        if (code == "KeyD" || code == "ArrowRight") {
+            moveTo = "right";
+        }
+        else if (code == "KeyA" || code == "ArrowLeft"){
+            moveTo = "left";
+        }
+        else if (code == "KeyS" || code == "ArrowDown"){
+            moveTo = "down";
+        }
+        else {
+            return;
+        }
+
+        var player = DeepCopy(this.state.player);
+
+        switch (moveTo){
+            case "right":
+                player.pos.x++;
+                break;
+            case "left":
+                player.pos.x--;
+                break;
+            case "down":
+                player.pos.y++;
+                break;
+        }
+
+        if (!this.isCollide(player)) {
+            this.setState({player: player});
+        }
+    }
     render () {
         return (
-            <div>
+            <div onKeyPress={()=>console.log("press")}>
                 <Scene antialias="true"
                        fog="type: linear; color: #e2e2e2; far: 30; near: 0"
                        inspector="url: https://aframe.io/aframe-inspector/dist/aframe-inspector.js"
-                       events={{loaded(){console.log("hey")}}}>
-                    <Camera>
-                        {/*<Text*/}
-                        {/*text='Hello World1!'*/}
-                        {/*color='#521616'*/}
-                        {/*position='-1.75 1 -3'/>*/}
+                       onLoaded={()=>{console.log("loaded")}}>
+                    <Camera wasd-controls="enabled:false;">
+                        {!this.state.isStarted && <Hint value="To start the game, press the start button"/>}
                         <Cursor/>
                     </Camera>
-                    <Entity primitive={"a-sound"} sound="src: ./theme.mp3; autoplay: true; loop: true" />
-                    <Entity primitive={"a-sky"} color="#AAB" />
+                    {this.state.isStarted && <Entity primitive="a-sound" sound="src: ./theme.mp3; autoplay: true; loop: true" />}
 
-                    <BasicSquare
-                        position='-1.75 7 -3'
-                        material="shader:html;target:#html-source"
-
-                        onClick={this.startGame.bind(this)}/>
+                    <Entity primitive="a-sky" color="#AAB" />
 
                     {/*{this.drawBackground()}*/}
                     <Entity position="-5 -10 -10">{this.drawField()}</Entity>
+
+                    {/*curved test*/}
+                    {/*<Entity geometry="primitive: cylinder; openEnded: true; thetaLength: 180"*/}
+                              {/*material="side: double" position="-5 -10 -10"></Entity>*/}
+
+                    <Entity position="0 0 -5">{this.drawMenu()}</Entity>
 
                     {/*<Z position={[-10, 0, -5]}/>*/}
 

@@ -4,8 +4,8 @@ import ReactDOM from 'react-dom';
 import {VRScene} from "./components/VRScene.jsx";
 
 const fieldSize = {
-    i: 12,
-    j: 20
+    i: 20,
+    j: 12
 };
 
 ReactDOM.render(
