@@ -163,7 +163,8 @@ export class VRScene extends React.Component {
             <div>
                 <Scene antialias="true"
                        fog="type: linear; color: #e2e2e2; far: 30; near: 0"
-                       inspector="url: https://aframe.io/aframe-inspector/dist/aframe-inspector.js">
+                       inspector="url: https://aframe.io/aframe-inspector/dist/aframe-inspector.js"
+                       events={{loaded(){console.log("hey")}}}>
                     <Camera>
                         {/*<Text*/}
                         {/*text='Hello World1!'*/}
