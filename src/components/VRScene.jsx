@@ -11,6 +11,7 @@ import BasicSquare from "./figures/basicSquare.jsx";
 import Hint from "./Hint.jsx";
 
 import Cursor from "./Cursor.jsx";
+import {FigureHelper} from "../FigureHelper";
 import React from 'react';
 import {HtmlContainer} from "./HtmlContainer.jsx";
 import DeepCopy from '../DeepCopy';
@@ -31,11 +32,7 @@ export class VRScene extends React.Component {
         this.initField();
         this.initKeyboardControlls();
 
-        this.state.player.matrix = [
-            [0,1,0],
-            [1,1,1],
-            [0,0,0]
-        ];
+        this.state.player.matrix = FigureHelper.getFigure();
     }
     startGame(){
       if (!this.state.isStarted) {
@@ -46,7 +43,9 @@ export class VRScene extends React.Component {
                 // console.log("dead");
                 player.pos.y--;
                 this.merge();
+                player.matrix = FigureHelper.getFigure();
                 player.pos.y = 0;
+                player.pos.x = 0;
                 //clearInterval(this.state.id);
             }
             this.setState({player: player});
@@ -140,7 +139,7 @@ export class VRScene extends React.Component {
                     return null;
                 }
                 else {
-                    material = "color: #6173F4"
+                    material = "color: " + FigureHelper.getFigureColor(elem);
                 }
 
                 return (
@@ -155,9 +154,10 @@ export class VRScene extends React.Component {
         player.matrix.forEach((row, rowIndex) => {
             row.forEach((elem, columnIndex)=> {
                 if (elem != 0 ) {
+                  var color = "color: " + FigureHelper.getFigureColor(elem);
                      entityList[player.pos.y + rowIndex][player.pos.x + columnIndex] = (
                         <BasicSquare
-                            material={"color: #6173F4"}
+                            material={color}
                             position={[player.pos.x + columnIndex, ROWS - player.pos.y - rowIndex, 0]}
                             onClick={this.rotate.bind(this)}
                     />)
