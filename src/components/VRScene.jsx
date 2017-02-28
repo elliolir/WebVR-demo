@@ -74,6 +74,11 @@ export class VRScene extends React.Component {
         var rotatedMatrix = ArrayHelper.rotateClockwise(playerMatrix);
         var updatedPlayer = DeepCopy(this.state.player);
         updatedPlayer.matrix = rotatedMatrix;
+        var offset = 1;
+        while (this.isCollide(updatedPlayer)) {
+            updatedPlayer.pos.x += offset;
+            offset = -(offset + (offset > 0 ? 1 : -1));
+        }
         this.setState({player: updatedPlayer});
     }
 
