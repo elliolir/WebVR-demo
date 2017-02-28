@@ -75,9 +75,14 @@ export class VRScene extends React.Component {
         var updatedPlayer = DeepCopy(this.state.player);
         updatedPlayer.matrix = rotatedMatrix;
         var offset = 1;
+        const originalPos = updatedPlayer.pos.x;
         while (this.isCollide(updatedPlayer)) {
-            updatedPlayer.pos.x += offset;
-            offset = -(offset + (offset > 0 ? 1 : -1));
+            updatedPlayer.pos.x = originalPos + offset;
+            offset = offset > 0 ? -offset : -offset + 1;
+            if (offset > rotatedMatrix[0].length) {
+                updatedPlayer.pos.x = originalPos;
+                return;
+            }
         }
         this.setState({player: updatedPlayer});
     }
@@ -140,19 +145,13 @@ export class VRScene extends React.Component {
 
         field.forEach((row, rowIndex) => {
             entityList.push(row.map((elem, columnIndex) => {
-                if (elem == 0) {
-                    return null;
-                }
-                else {
+                if (elem != 0) {
                     material = "color: " + FigureHelper.getFigureColor(elem);
-                }
-
-                return (
-                    <BasicSquare
+                    return (<BasicSquare
                         material={material}
                         position={[columnIndex, ROWS - rowIndex,  0]}
                     />);
-                // return null;
+                }
             }));
         });
 
