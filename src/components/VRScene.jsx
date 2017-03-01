@@ -221,7 +221,9 @@ export class VRScene extends React.Component {
                     </Camera>
                     {this.state.isStarted && <Entity primitive="a-sound" sound="src: ./theme.mp3; autoplay: true; loop: true" />}
 
-                    <Entity primitive="a-sky" color="#AAB" />
+                    <Entity geometry={{primitive: "plane", height: 20, width: 20}} material={{shader:"html", target:"#html-source"}} position={[1, 0, -8]}/>
+
+                    <a-sky color="#AAB" />
 
                     {/*{this.drawBackground()}*/}
                     <Entity position="-5 -10 -10">{this.drawField()}</Entity>
