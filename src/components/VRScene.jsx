@@ -45,7 +45,7 @@ export class VRScene extends React.Component {
                 this.merge();
                 player.matrix = FigureHelper.getFigure();
                 player.pos.y = 0;
-                player.pos.x = 0;
+                player.pos.x = Math.floor(this.props.size.j/2);
                 //clearInterval(this.state.id);
             }
             this.setState({player: player});
