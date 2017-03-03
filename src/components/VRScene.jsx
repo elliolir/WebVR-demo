@@ -43,6 +43,7 @@ export class VRScene extends React.Component {
                 // console.log("dead");
                 player.pos.y--;
                 this.merge();
+                this.checkAndRemoveFullRows(player);
                 player.matrix = FigureHelper.getFigure();
                 player.pos.y = 0;
                 player.pos.x = Math.floor(this.props.size.j/2);
@@ -57,6 +58,28 @@ export class VRScene extends React.Component {
         this.setState({ isStarted: false});
       }
 
+    }
+    checkAndRemoveFullRows(player){
+      var rowCount = 0;
+      var field = DeepCopy(this.state.field);
+      for (var y = field.length - 1; y > 0; y--) {
+        if (field[y].indexOf(0) != -1) {
+          continue;
+        }
+
+          var row = field.splice(y, 1)[0].fill(0);
+          field.unshift(row);
+          ++y;
+
+          rowCount = rowCount ? rowCount * 2 : 1;
+
+          player.score += rowCount * 10;
+          rowCount *= 2;
+      }
+
+      if (rowCount){
+        this.setState({field: field});
+      }
     }
     initField(){
         const [ROWS, COLUMNS] = [this.props.size.i, this.props.size.j];
@@ -90,7 +113,7 @@ export class VRScene extends React.Component {
     merge() {
         //merge player figure and game field
         var field = DeepCopy(this.state.field);
-        var player = this.state.player;
+        var {player} = this.state;
         player.matrix.forEach((row, rowIndex) => {
             row.forEach((value, x) => {
                 if (value !== 0) {
@@ -102,13 +125,12 @@ export class VRScene extends React.Component {
         this.setState({field: field});
     }
     isCollide(player){
-        var matrix = player.matrix;
-        var position = player.pos;
+        var {matrix, pos} = player;
         var field = this.state.field;
 
         for (var i = 0; i < matrix.length; i++) {
             for (var j = 0; j < matrix[i].length; j++) {
-                if (matrix[i][j] && (!field[i + position.y] || field[i + position.y][j + position.x] != 0)) {
+                if (matrix[i][j] && (!field[i + pos.y] || field[i + pos.y][j + pos.x] != 0)) {
                     return true;
                 }
             }
@@ -138,8 +160,7 @@ export class VRScene extends React.Component {
     drawField(){
         const ROWS = this.props.size.i;
 
-        var field = this.state.field;
-        var player = this.state.player;
+        var {field, player} = this.state;
         var entityList = [];
         var material;
 
@@ -221,7 +242,7 @@ export class VRScene extends React.Component {
                     </Camera>
                     {this.state.isStarted && <Entity primitive="a-sound" sound="src: ./theme.mp3; autoplay: true; loop: true" />}
 
-                    <Entity geometry={{primitive: "plane", height: 20, width: 20}} material={{shader:"html", target:"#html-source"}} position={[1, 0, -8]}/>
+                    {/*<Entity geometry={{primitive: "plane", height: 20, width: 20}} material={{shader:"html", target:"#html-source"}} position={[1, 0, -8]}/>*/}
 
                     <a-sky color="#AAB" />
 
@@ -232,7 +253,7 @@ export class VRScene extends React.Component {
                     {/*<Entity geometry="primitive: cylinder; openEnded: true; thetaLength: 180"*/}
                               {/*material="side: double" position="-5 -10 -10"></Entity>*/}
 
-                    <Entity position="0 0 -5">{this.drawMenu()}</Entity>
+                    // {<Entity position="0 0 -5">{this.drawMenu()}</Entity>}
 
                     {/*<Z position={[-10, 0, -5]}/>*/}
 
