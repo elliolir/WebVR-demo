@@ -69,7 +69,7 @@ export class VRScene extends React.Component {
 
           var row = field.splice(y, 1)[0].fill(0);
           field.unshift(row);
-          ++y;
+          y++;
 
           rowCount = rowCount ? rowCount * 2 : 1;
 
