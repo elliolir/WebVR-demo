@@ -40,7 +40,6 @@ export class VRScene extends React.Component {
             var player = DeepCopy(this.state.player);
             player.pos.y++;
             if (this.isCollide(player)) {
-                // console.log("dead");
                 player.pos.y--;
                 this.merge();
                 this.checkAndRemoveFullRows(player);
@@ -142,8 +141,9 @@ export class VRScene extends React.Component {
       if (!this.state.isStarted) {
         return (
           <BasicSquare
-            position='-1.75 7 -3'
             material="shader:html;target:#html-source"
+            position={[10,0,0]}
+            animation={{property: 'position', dir: "alternate", dur: 2500, loop: true, to: '-10 0 0'}}
             onClick={this.startGame.bind(this)}/>)
       }
     }
@@ -231,10 +231,11 @@ export class VRScene extends React.Component {
     }
     render () {
         return (
-            <div onKeyPress={()=>console.log("press")}>
+            <div>
                 <Scene antialias="true"
-                       fog="type: linear; color: #e2e2e2; far: 30; near: 0"
+                       fog="type: linear; color: #fdfdea; far: 30; near: 0"
                        inspector="url: https://aframe.io/aframe-inspector/dist/aframe-inspector.js"
+                       vr-mode-ui="enabled: true"
                        onLoaded={()=>{console.log("loaded")}}>
                     <Camera wasd-controls="enabled:false;">
                         {!this.state.isStarted && <Hint value="To start the game, press the start button"/>}
@@ -242,9 +243,15 @@ export class VRScene extends React.Component {
                     </Camera>
                     {this.state.isStarted && <Entity primitive="a-sound" sound="src: ./theme.mp3; autoplay: true; loop: true" />}
 
-                    {/*<Entity geometry={{primitive: "plane", height: 20, width: 20}} material={{shader:"html", target:"#html-source"}} position={[1, 0, -8]}/>*/}
+                    <Entity  position={[0.5, 0.5, -10.5]}>
+                        <Entity geometry={{primitive: "plane", height: 20, width: 12}}/>
+                        <Entity geometry={{primitive: "plane", height: 1, width: 12}} rotation={[-90,0,0]} position={[0, -10, 0.5]}/>
+                        <Entity geometry={{primitive: "plane", height: 20, width: 1}} rotation={[0,90,0]} position={[6, 0, 0.5]}/>
+                        <Entity geometry={{primitive: "plane", height: 20, width: 1}} rotation={[0,90,0]} position={[-6, 0, 0.5]}/>
+                    </Entity>
 
                     <a-sky color="#AAB" />
+                    {/*<Entity light={{type: 'ambient', color: '#888'}}/>*/}
 
                     {/*{this.drawBackground()}*/}
                     <Entity position="-5 -10 -10">{this.drawField()}</Entity>
@@ -253,7 +260,7 @@ export class VRScene extends React.Component {
                     {/*<Entity geometry="primitive: cylinder; openEnded: true; thetaLength: 180"*/}
                               {/*material="side: double" position="-5 -10 -10"></Entity>*/}
 
-                    // {<Entity position="0 0 -5">{this.drawMenu()}</Entity>}
+                    {<Entity position="0 1.5 -5">{this.drawMenu()}</Entity>}
 
                     {/*<Z position={[-10, 0, -5]}/>*/}
 
