@@ -1,5 +1,5 @@
 import React from "react";
 
-export function HtmlContainer(){
-    return <div id="html-source" className="html-container">Hello it's me</div>
+export function HtmlContainer(props){
+    return <div id="html-source" className="html-container">{props.msg}</div>
 }

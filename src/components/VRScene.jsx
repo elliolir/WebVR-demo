@@ -1,20 +1,19 @@
 import 'aframe';
 import 'aframe-animation-component';
 import 'aframe-html-shader';
-//import 'aframe-text-component';
-// import 'aframe-bmfont-text-component';
 import {Entity, Scene} from 'aframe-react';
-//import Text from "./Text.jsx";
 import Camera from "./Camera.jsx";
 import ArrayHelper from "../helper";
-import BasicSquare from "./figures/basicSquare.jsx";
+import BasicSquare from "./basicSquare.jsx";
 import Hint from "./Hint.jsx";
-
 import Cursor from "./Cursor.jsx";
 import {FigureHelper} from "../FigureHelper";
 import React from 'react';
 import {HtmlContainer} from "./HtmlContainer.jsx";
 import DeepCopy from '../DeepCopy';
+import GameField from './GameField.jsx';
+import StartBtn from './StartBtn.jsx';
+import Score from './Score.jsx';
 import "../styles.less";
 
 export class VRScene extends React.Component {
@@ -31,12 +30,11 @@ export class VRScene extends React.Component {
         };
         this.initField();
         this.initKeyboardControlls();
-
-        this.state.player.matrix = FigureHelper.getFigure();
+        this.startGame = this.startGame.bind(this);
     }
     startGame(){
-      if (!this.state.isStarted) {
-        var id = setInterval(()=>{
+        this.state.player.matrix = FigureHelper.getFigure();
+        var id = setInterval(() => {
             var player = DeepCopy(this.state.player);
             player.pos.y++;
             if (this.isCollide(player)) {
@@ -45,18 +43,11 @@ export class VRScene extends React.Component {
                 this.checkAndRemoveFullRows(player);
                 player.matrix = FigureHelper.getFigure();
                 player.pos.y = 0;
-                player.pos.x = Math.floor(this.props.size.j/2);
-                //clearInterval(this.state.id);
+                player.pos.x = Math.floor(this.props.size.j/2) - Math.floor(player.matrix.length/2);
             }
             this.setState({player: player});
         }, 1000);
         this.setState({ isStarted: true, id: id});
-      }
-      else {
-        clearInterval(this.state.id);
-        this.setState({ isStarted: false});
-      }
-
     }
     checkAndRemoveFullRows(player){
       var rowCount = 0;
@@ -92,21 +83,20 @@ export class VRScene extends React.Component {
         this.state.field = clearField;
     }
     rotate(){
-        var playerMatrix = DeepCopy(this.state.player.matrix);
-        var rotatedMatrix = ArrayHelper.rotateClockwise(playerMatrix);
-        var updatedPlayer = DeepCopy(this.state.player);
-        updatedPlayer.matrix = rotatedMatrix;
+        var player = DeepCopy(this.state.player);
+        player.matrix = ArrayHelper.rotateClockwise(player.matrix);
         var offset = 1;
-        const originalPos = updatedPlayer.pos.x;
-        while (this.isCollide(updatedPlayer)) {
-            updatedPlayer.pos.x = originalPos + offset;
+        const originalPos = player.pos.x;
+
+        while (this.isCollide(player)) {
+            player.pos.x = originalPos + offset;
             offset = offset > 0 ? -offset : -offset + 1;
-            if (offset > rotatedMatrix[0].length) {
-                updatedPlayer.pos.x = originalPos;
+            if (offset > player.matrix[0].length) {
+                player.pos.x = originalPos;
                 return;
             }
         }
-        this.setState({player: updatedPlayer});
+        this.setState({player: player});
     }
 
     merge() {
@@ -137,26 +127,6 @@ export class VRScene extends React.Component {
 
         return false;
     }
-    drawMenu(){
-      if (!this.state.isStarted) {
-        return (
-          <BasicSquare
-            material="shader:html;target:#html-source"
-            position={[10,0,0]}
-            animation={{property: 'position', dir: "alternate", dur: 2500, loop: true, to: '-10 0 0'}}
-            onClick={this.startGame.bind(this)}/>)
-      }
-    }
-    drawBackground(){
-        const [ROWS, COLUMNS] = [this.props.size.i, this.props.size.j];
-
-        var geometry = {primitive: "plane", height: ROWS, width: COLUMNS};
-
-        return (<Entity geometry={geometry}
-                        position="0 1 -11"
-                        material={"color:white"}
-                        />);
-    }
     drawField(){
         const ROWS = this.props.size.i;
 
@@ -176,16 +146,16 @@ export class VRScene extends React.Component {
             }));
         });
 
-        player.matrix.forEach((row, rowIndex) => {
+        player.matrix && player.matrix.forEach((row, rowIndex) => {
             row.forEach((elem, columnIndex)=> {
                 if (elem != 0 ) {
-                  var color = "color: " + FigureHelper.getFigureColor(elem);
-                     entityList[player.pos.y + rowIndex][player.pos.x + columnIndex] = (
+                    var color = "color: " + FigureHelper.getFigureColor(elem);
+                    entityList[player.pos.y + rowIndex][player.pos.x + columnIndex] = (
                         <BasicSquare
                             material={color}
                             position={[player.pos.x + columnIndex, ROWS - player.pos.y - rowIndex, 0]}
                             onClick={this.rotate.bind(this)}
-                    />)
+                        />)
                 }
             })
         });
@@ -233,60 +203,27 @@ export class VRScene extends React.Component {
         return (
             <div>
                 <Scene antialias="true"
-                       fog="type: linear; color: #fdfdea; far: 30; near: 0"
+                       fog="type: linear; color: #fdfdea; far: 50; near: 0"
                        inspector="url: https://aframe.io/aframe-inspector/dist/aframe-inspector.js"
                        vr-mode-ui="enabled: true"
                        onLoaded={()=>{console.log("loaded")}}>
+                    <a-sky color="#AAB" />
                     <Camera wasd-controls="enabled:false;">
-                        {!this.state.isStarted && <Hint value="To start the game, press the start button"/>}
+                        {!this.state.isStarted && <Hint value="To start the game, (try to) press the start button"/>}
                         <Cursor/>
                     </Camera>
-                    {this.state.isStarted && <Entity primitive="a-sound" sound="src: ./theme.mp3; autoplay: true; loop: true" />}
+                    {this.state.isStarted && <Entity primitive="a-sound" sound={{src: "./theme.mp3", autoplay: true, loop: true}} />}
 
-                    <Entity  position={[0.5, 0.5, -10.5]}>
-                        <Entity geometry={{primitive: "plane", height: 20, width: 12}}/>
-                        <Entity geometry={{primitive: "plane", height: 1, width: 12}} rotation={[-90,0,0]} position={[0, -10, 0.5]}/>
-                        <Entity geometry={{primitive: "plane", height: 20, width: 1}} rotation={[0,90,0]} position={[6, 0, 0.5]}/>
-                        <Entity geometry={{primitive: "plane", height: 20, width: 1}} rotation={[0,90,0]} position={[-6, 0, 0.5]}/>
-                    </Entity>
+                    <GameField size={this.props.size} position={[0.5, 0.5, -10.5]} color="#c3efff"/>
 
-                    <a-sky color="#AAB" />
-                    {/*<Entity light={{type: 'ambient', color: '#888'}}/>*/}
+                    {this.state.isStarted && <Score score={this.state.player.score}/>}
 
-                    {/*{this.drawBackground()}*/}
-                    <Entity position="-5 -10 -10">{this.drawField()}</Entity>
+                    <Entity position={[-5, -10, -10]}> {this.drawField()} </Entity>
 
-                    {/*curved test*/}
-                    {/*<Entity geometry="primitive: cylinder; openEnded: true; thetaLength: 180"*/}
-                              {/*material="side: double" position="-5 -10 -10"></Entity>*/}
-
-                    {<Entity position="0 1.5 -5">{this.drawMenu()}</Entity>}
-
-                    {/*<Z position={[-10, 0, -5]}/>*/}
-
-                    {/*<S position={[-7, 0, -5]}/>*/}
-
-                    {/*<T position={[-4, 0, -5]}/>*/}
-
-                    {/*<L position={[0, 0, -5]}/>*/}
-
-                    {/*<J position={[4, 0, -5]}/>*/}
-
-                    {/*<I position={[6, 0, -5]}/>*/}
-
-                    {/*<O position={[8, 0, -5]}/>*/}
-
-
-                    {/*<Entity geometry={{primitive: 'box'}}*/}
-                    {/*material="color: red"*/}
-                    {/*position={[0, 2, -5]}*/}
-                    {/*scale="2 2 2"*/}
-                    {/*rotation="0 45 45"*/}
-                    {/*animation="property: scale; dir: alternate; dur: 200;*/}
-                    {/*easing: easeInSine; loop: true; to: 1.2 1 1.2"/>*/}
+                    <Entity position={[0, 1.5, -5]}> {!this.state.isStarted && <StartBtn clickHandler={this.startGame}/>} </Entity>
                 </Scene>
 
-                <HtmlContainer/>
+                <HtmlContainer msg={"Hello it's me"}/>
             </div>
         );
     }
