@@ -6,11 +6,11 @@ import "array.prototype.fill";
 import {Entity, Scene} from 'aframe-react';
 
 import Camera from "./components/Camera.jsx";
-import ArrayHelper from "./utils/ArrayHelper";
+import ArrayRotator from "./utils/ArrayRotator";
 import BasicCube from "./components/BasicCube.jsx";
 import Hint from "./components/Hint.jsx";
 import Cursor from "./components/Cursor.jsx";
-import FigureHelper from "./utils/FigureHelper";
+import FigureProvider from "./utils/FigureProvider";
 import HtmlContainer from "./components/HtmlContainer.jsx";
 import DeepCopy from './utils/DeepCopy';
 import FieldBackground from './components/FieldBackground.jsx';
@@ -81,7 +81,7 @@ export class VRScene extends React.Component {
 	}
 
 	initNewFigure(player) {
-		player.matrix = FigureHelper.getFigure();
+		player.matrix = FigureProvider.getFigure();
 		player.pos.y = 0;
 		player.pos.x = Math.floor(this.props.size.j / 2) - Math.floor(player.matrix.length / 2);
 
@@ -128,7 +128,7 @@ export class VRScene extends React.Component {
 		var offset = 1;
 		const originalPos = player.pos.x;
 
-		player.matrix = ArrayHelper.rotateClockwise(player.matrix);
+		player.matrix = ArrayRotator.rotateClockwise(player.matrix);
 
 		while (this.isCollide(player)) {
 			player.pos.x = originalPos + offset;
@@ -180,7 +180,7 @@ export class VRScene extends React.Component {
 		field.forEach((row, rowIndex) => {
 			entityList.push(row.map((elem, columnIndex) => {
 				if (elem != 0) {
-					material = "color: " + FigureHelper.getFigureColor(elem);
+					material = "color: " + FigureProvider.getFigureColor(elem);
 					return (<BasicCube
 						material={material}
 						position={[columnIndex, ROWS - rowIndex, 0]}
@@ -192,7 +192,7 @@ export class VRScene extends React.Component {
 		player.matrix && player.matrix.forEach((row, rowIndex) => {
 			row.forEach((elem, columnIndex) => {
 				if (elem != 0) {
-					var color = "color: " + FigureHelper.getFigureColor(elem);
+					var color = "color: " + FigureProvider.getFigureColor(elem);
 					entityList[player.pos.y + rowIndex][player.pos.x + columnIndex] = (
 						<BasicCube
 							material={color}
