@@ -17,10 +17,8 @@
   "dependencies": {
     "aframe": "^0.5.0",
     "aframe-animation-component": "^3.2.1",
-    "aframe-bmfont-text-component": "^0.1.4",
     "aframe-html-shader": "^0.1.1",
     "aframe-react": "^3.4.1",
-    "aframe-text-component": "^0.4.2",
     "array.prototype.fill": "^1.0.2",
     "react": "^15.4.2",
     "react-dom": "^15.4.2"
