@@ -2,6 +2,7 @@ import 'aframe';
 import 'aframe-animation-component';
 import 'aframe-html-shader';
 import {Entity, Scene} from 'aframe-react';
+import "array.prototype.fill";
 import Camera from "./Camera.jsx";
 import ArrayHelper from "../helper";
 import BasicSquare from "./basicSquare.jsx";
