@@ -1,4 +1,2 @@
 # WebVR-demo
-some WebVR stuff
-
-right now it consist of garbage but eventually it going to be nice tetris
+VR-tetris built with A-frame and react
