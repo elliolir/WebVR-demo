@@ -2,7 +2,7 @@ import {T, J, L, O, S, Z, I} from './figures';
 
 //const FIGURES_ARRAY = [T, J, L, O, S, Z, I];
 
-export var FigureHelper = {
+export default {
 	_FIGURES_ARRAY: [T, J, L, O, S, Z, I],
 	_COLOR_ARRAY: [
 		'#FF0D72',

@@ -3,16 +3,16 @@ import 'aframe-animation-component';
 import 'aframe-html-shader';
 import React from 'react';
 import "array.prototype.fill";
-
 import {Entity, Scene} from 'aframe-react';
+
 import Camera from "./components/Camera.jsx";
-import ArrayHelper from "./helpers/ArrayHelper";
+import ArrayHelper from "./utils/ArrayHelper";
 import BasicCube from "./components/BasicCube.jsx";
 import Hint from "./components/Hint.jsx";
 import Cursor from "./components/Cursor.jsx";
-import {FigureHelper} from "./helpers/FigureHelper";
-import {HtmlContainer} from "./components/HtmlContainer.jsx";
-import DeepCopy from './helpers/DeepCopy';
+import FigureHelper from "./utils/FigureHelper";
+import HtmlContainer from "./components/HtmlContainer.jsx";
+import DeepCopy from './utils/DeepCopy';
 import FieldBackground from './components/FieldBackground.jsx';
 import StartBtn from './components/StartBtn.jsx';
 import Score from './components/Score.jsx';
@@ -43,7 +43,7 @@ export class VRScene extends React.Component {
 		player.score = 0;
 
 		this.initField();
-		this._initNewFigure(player);
+		this.initNewFigure(player);
 
 		var id = setInterval(() => {
 			this.dropPlayer();
@@ -58,30 +58,29 @@ export class VRScene extends React.Component {
 	}
 
 	endGame(player) {
-		var {isStarted, intervalId} = this.state;
-
+		var {intervalId} = this.state;
 		clearInterval(intervalId);
 
-		isStarted = false;
-		intervalId = null;
 		player.matrix = null;
 
-		this.setState({isStarted: isStarted, intervalId: intervalId});
+		this.setState({isStarted: false, intervalId: null});
 	}
 
 	dropPlayer() {
 		var player = DeepCopy(this.state.player);
 		player.pos.y++;
+
 		if (this.isCollide(player)) {
 			player.pos.y--;
 			this.merge();
 			this.checkAndRemoveFullRows(player);
-			this._initNewFigure(player);
+			this.initNewFigure(player);
 		}
-		this.setState({player: player});
+
+		this.setState({player});
 	}
 
-	_initNewFigure(player) {
+	initNewFigure(player) {
 		player.matrix = FigureHelper.getFigure();
 		player.pos.y = 0;
 		player.pos.x = Math.floor(this.props.size.j / 2) - Math.floor(player.matrix.length / 2);
@@ -94,6 +93,7 @@ export class VRScene extends React.Component {
 	checkAndRemoveFullRows(player) {
 		var rowCount = 0;
 		var field = DeepCopy(this.state.field);
+
 		for (var y = field.length - 1; y > 0; y--) {
 			if (field[y].indexOf(0) != -1) {
 				continue;
@@ -108,7 +108,7 @@ export class VRScene extends React.Component {
 		}
 
 		if (rowCount) {
-			this.setState({field: field});
+			this.setState({field});
 		}
 	}
 
@@ -125,9 +125,10 @@ export class VRScene extends React.Component {
 
 	rotate() {
 		var player = DeepCopy(this.state.player);
-		player.matrix = ArrayHelper.rotateClockwise(player.matrix);
 		var offset = 1;
 		const originalPos = player.pos.x;
+
+		player.matrix = ArrayHelper.rotateClockwise(player.matrix);
 
 		while (this.isCollide(player)) {
 			player.pos.x = originalPos + offset;
@@ -172,7 +173,6 @@ export class VRScene extends React.Component {
 
 	drawField() {
 		const ROWS = this.props.size.i;
-
 		var {field, player} = this.state;
 		var entityList = [];
 		var material;
